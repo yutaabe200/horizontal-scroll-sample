@@ -33,6 +33,12 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
+    
+    override func viewWillLayoutSubviews() {
+        self.collectionView.visibleCells.forEach { cell in
+            self.transformScale(cell: cell)
+        }
+    }
 
 }
 
@@ -48,6 +54,22 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         self.flowLayout.prepareForPaging()
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.collectionView.visibleCells.forEach { cell in
+            self.transformScale(cell: cell)
+        }
+    }
+    
+    private func transformScale(cell: UICollectionViewCell) {
+        let cellCenter: CGPoint = self.collectionView.convert(cell.center, to: nil)
+        let screenCenterX: CGFloat = UIScreen.main.bounds.width / 2
+        let reductionRatio: CGFloat = -0.0005
+        let maxScale: CGFloat = 1
+        let cellCenterDisX: CGFloat = abs(screenCenterX - cellCenter.x)
+        let newScale = reductionRatio * cellCenterDisX + maxScale
+        cell.transform = CGAffineTransform(scaleX: newScale, y: newScale)
     }
     
 }
